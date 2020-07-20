@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Home Page</title>
+</head>
+<body>
+    {{#each users}}
+    <ul class="flex-item">
+        <li><h1>Hello, {{this.allUsers}} {{this.name}} {{this.email}}</h1></li>
+        <h1>{{message}}</h1>
+        <div class="buttons">
+            <div class="update-user">
+                <form action="/update/{{this._id}}" method="GET" >
+                    <button class="edit" type="submit">Edit</button>
+                </form>
+            </div>
+            
+            <div>
+                <form action="/{{this._id}}" method="GET">
+                    <button class="delete" type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
+    </ul>
+    {{/each}}
+    {{#if message}}
+        <h4 class="alert">{{message}}</h4>
+    {{/if}}
+</body>
+</html>

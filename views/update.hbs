@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Update</title>
+</head>
+<body>
+    <div class="container">
+        <form action="/update/{{id}}" method="POST">
+            <label for="newUserName"></label>
+            <input type="text" name="newUserName" value={{userName}} placeholder="User Name">
+            
+            <label for="userEmail"></label>
+            <input type="email" value={{userEmail}} name="newUserEmail" placeholder="email">
+
+            <label for="userPassword"></label>
+            <input type="password" name="currentPassword" placeholder="password">
+
+            <label for="newPassword"></label>
+            <input type="password" name="newUserPassword" placeholder="New password">
+
+            <label for="confirmPassword"></label>
+            <input type="password" name="confirmPassword" placeholder="Confirm password">
+            <button type="submit">Update</button>
+            {{message}}
+        </form>
+    </div>
+</body>
+</html>

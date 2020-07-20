@@ -11,11 +11,13 @@ const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const auth = require('./middleware/auth');
+const { db, findById } = require('./models/user');
 
 
 // Intialises express
 const app = express();
 
+app.use(express.static('public'));
 
 app.use(express.urlencoded());
 app.use(express.json());
@@ -24,9 +26,6 @@ app.use(cookieParser());
 const viewsPath = path.join(__dirname, '/views');
 app.set('views', viewsPath);
 app.set('view engine', 'hbs');
-
-app.use(express.static('public'));
-
 
 // Below removes warning messages that don't affect code. By using process.env.DB_URL can access .env file
 mongoose.connect( process.env.DB_URL ,{
@@ -37,12 +36,13 @@ mongoose.connect( process.env.DB_URL ,{
 }).then(() => console.log('MongoDB is connected'));
 
 
-app.get("/", async (req, res) => {
-
-    res.send("This is the home page");
-
-});
-
+app.get("/", async (req,res) => {
+    const allUsers = await User.find();
+    console.log(allUsers);
+    res.render("index", {
+        users: allUsers
+    })
+})
 
 app.get("/register", (req, res) => {
     res.render("register");
@@ -65,15 +65,6 @@ app.post("/register", async (req, res) => {
     );
 
      res.send("User updated");
-});
-
-app.get("/register", async (req, res) => {
-    await User.create({
-        name: "matt",
-        email: "mattlaws@email.com",
-        password: "1234"
-    });
-    res.send('User registered');
 });
 
 
@@ -135,8 +126,84 @@ app.get("/profile", auth.isLoggedIn, (req, res) => {
     }
 });
 
- app.get("/delete", async (req, res) => {
-     res.respond("update");
+ app.get("/delete", (req, res) => {
+     res.render("index") 
+     
+ });
+
+ app.post("/delete/:id", async (req, res) => {
+    let id = req.params.id;
+    let userData = await User.findById(id)
+  
+    res.render('index', {
+        message: `User '${userData.name}' deleted`
+    })
+});
+
+/***********************************
+ 
+************************************/
+
+app.get("/update/:id", async (req, res) => {
+
+    console.log('Accessing update page');
+
+    const id = req.params.id;
+    const user = await User.findById(id);
+
+    console.log(user);
+
+    res.render("update", {
+       id,
+       userName: user.name,
+       userEmail: user.email 
+      
+    });
+});
+
+ app.post("/update/:id", async (req, res) => {
+   console.log("updating user....");
+
+   const newUserName =  req.body.newUserName;
+   const newUserEmail = req.body.newUserEmail;
+   const currentPassword = req.body.currentPassword
+   const newUserPassword = req.body.newUserPassword;
+   const confirmPassword = req.body.confirmPassword;
+   const hashPassword = await bcrypt.hash(newUserPassword, 8);
+
+   const id = req.params.id;
+   const user = await User.findById(id);
+   const isMatch = await bcrypt.compare(currentPassword, user.password)
+
+   if( isMatch && newUserPassword === confirmPassword  ) {
+
+        await User.findByIdAndUpdate(id, { 
+            name: newUserName, 
+            email: newUserEmail, 
+            password: hashPassword
+        });
+
+        res.render("update", {
+            id,
+            userName: newUserName,
+            userEmail: newUserEmail,
+            message: "User updated successfully!"
+        }); 
+    } else if (isMatch && newUserPassword != newUserPassword2) {
+        res.render("update", {
+            id,
+            userName: user.name,
+            userEmail: user.email,
+            message: 'Passwords do not match'
+        });
+    } else if (!isMatch) {
+        res.render("update", {
+            id,
+            userName: user.name,
+            userEmail: user.email,
+            message: 'Oh no! Your password is not correct'
+        });
+    };
  });
 
  app.get('/logout', auth.logout, (req, res) => {
@@ -144,6 +211,3 @@ app.get("/profile", auth.isLoggedIn, (req, res) => {
  })
 
 app.listen(process.env.PORT, () => console.log(`Server started on Port ${process.env.PORT}`));
-
-//git remote add origin https://github.com/matt-l-82/node-login-project.git
-//git push -u origin master

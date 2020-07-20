@@ -3,15 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="stylesheet" href="css/styles.css">
+     <link rel="stylesheet" href="/css/styles.css">
     <title>Register</title>
 </head>
 <body>
-    <form action="/register" method="POST">
-        <input type="text" name="userName">
-        <input type="email" name="userEmail">
-        <input type="password" name="userPassword">
-        <button type="submit">Register</button>
-    </form>
+    <div class="container">
+        <form action="/register" method="POST">
+            <label for="userName"></label>
+            <input type="text" name="userName" placeholder="User Name">
+            
+            <label for="userEmail"></label>
+            <input type="email" value="{{email}}" name="userEmail" placeholder="email">
+
+            <label for="userPassword"></label>
+            <input type="password" name="userPassword" placeholder="password">
+            <button type="submit">Register</button>
+        </form>
+    </div>
 </body>
 </html>
